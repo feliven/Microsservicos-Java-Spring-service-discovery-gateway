@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,5 +61,10 @@ public class PedidoController {
         service.aprovaPagamentoPedido(id);
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("porta")
+    public String retornaPorta(@Value("${local.server.port}") String porta) {
+        return String.format("Requisição respondida pela instância rodando na porta %s", porta);
     }
 }
