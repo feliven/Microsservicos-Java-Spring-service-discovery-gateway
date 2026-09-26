@@ -12,6 +12,6 @@ public record PagamentoDto(
         String codigo,
         Status status,
         Long pedidoId,
-        Long formaDePagamentoId) {
+        Long formaPagamentoId) {
 
 }
