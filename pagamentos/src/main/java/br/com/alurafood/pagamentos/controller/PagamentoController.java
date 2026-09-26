@@ -16,6 +16,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.alurafood.pagamentos.dto.PagamentoDto;
 import br.com.alurafood.pagamentos.service.PagamentoService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("pagamentos")
@@ -31,13 +33,14 @@ public class PagamentoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PagamentoDto> getById(@PathVariable Long id) {
+    public ResponseEntity<PagamentoDto> getById(@PathVariable @NotNull Long id) {
         var dto = service.obterPagamentoPorId(id);
         return ResponseEntity.ok(dto);
     }
 
     @PostMapping
-    public ResponseEntity<PagamentoDto> postPagamento(@RequestBody PagamentoDto dto, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<PagamentoDto> postPagamento(@RequestBody @Valid PagamentoDto dto,
+            UriComponentsBuilder uriBuilder) {
         var pagamento = service.criarPagamento(dto);
 
         var uri = uriBuilder.path("/pagamentos/{id}").buildAndExpand(pagamento.id()).toUri();
@@ -46,13 +49,14 @@ public class PagamentoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PagamentoDto> putPagamento(@RequestBody PagamentoDto dto, @PathVariable Long id) {
-        var resposta = service.atualizarPagamento(id, dto);
-        return ResponseEntity.ok(resposta);
+    public ResponseEntity<PagamentoDto> putPagamento(@RequestBody @Valid PagamentoDto dto,
+            @PathVariable @NotNull Long id) {
+        var pagamentoAtualizado = service.atualizarPagamento(id, dto);
+        return ResponseEntity.ok(pagamentoAtualizado);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePagamento(@PathVariable Long id) {
+    public ResponseEntity<String> deletePagamento(@PathVariable @NotNull Long id) {
         service.excluirPagamento(id);
         return ResponseEntity.noContent().build();
     }
