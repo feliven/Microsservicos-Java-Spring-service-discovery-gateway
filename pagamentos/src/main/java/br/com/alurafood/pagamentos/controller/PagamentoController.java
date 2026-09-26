@@ -43,7 +43,7 @@ public class PagamentoController {
             UriComponentsBuilder uriBuilder) {
         var pagamento = service.criarPagamento(dto);
 
-        var uri = uriBuilder.path("/pagamentos/{id}").buildAndExpand(pagamento.id()).toUri();
+        var uri = uriBuilder.path("/pagamentos/{id}").buildAndExpand(pagamento.getId()).toUri();
 
         return ResponseEntity.created(uri).body(pagamento);
     }
