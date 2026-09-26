@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,7 +33,7 @@ public class PagamentoController {
         return ResponseEntity.ok(pagamentos);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<PagamentoDto> getById(@PathVariable @NotNull Long id) {
         var dto = service.obterPagamentoPorId(id);
         return ResponseEntity.ok(dto);
@@ -48,16 +49,21 @@ public class PagamentoController {
         return ResponseEntity.created(uri).body(pagamento);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     public ResponseEntity<PagamentoDto> putPagamento(@RequestBody @Valid PagamentoDto dto,
             @PathVariable @NotNull Long id) {
         var pagamentoAtualizado = service.atualizarPagamento(id, dto);
         return ResponseEntity.ok(pagamentoAtualizado);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<String> deletePagamento(@PathVariable @NotNull Long id) {
         service.excluirPagamento(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("{id}/confirmar")
+    public void confirmarPagamento(@PathVariable @NotNull Long id) {
+        service.confirmarPagamento(id);
     }
 }
