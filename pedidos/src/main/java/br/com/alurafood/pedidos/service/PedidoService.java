@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.alurafood.pedidos.dto.PedidoDto;
 import br.com.alurafood.pedidos.dto.StatusDto;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PedidoService {
 
     @Autowired
@@ -39,6 +41,7 @@ public class PedidoService {
         return modelMapper.map(pedido, PedidoDto.class);
     }
 
+    @Transactional
     public PedidoDto criarPedido(PedidoDto dto) {
         Pedido pedido = modelMapper.map(dto, Pedido.class);
 
@@ -50,6 +53,7 @@ public class PedidoService {
         return modelMapper.map(pedido, PedidoDto.class);
     }
 
+    @Transactional
     public PedidoDto atualizaStatus(Long id, StatusDto dto) {
 
         Pedido pedido = repository.porIdComItens(id);
@@ -63,6 +67,7 @@ public class PedidoService {
         return modelMapper.map(pedido, PedidoDto.class);
     }
 
+    @Transactional
     public void aprovaPagamentoPedido(Long id) {
 
         Pedido pedido = repository.porIdComItens(id);
