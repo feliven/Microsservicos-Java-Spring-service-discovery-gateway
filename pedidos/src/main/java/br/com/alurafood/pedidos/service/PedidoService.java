@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class PedidoService {
 
     @Autowired
@@ -28,12 +27,14 @@ public class PedidoService {
     @Autowired
     private final ModelMapper modelMapper;
 
+    @Transactional(readOnly = true)
     public List<PedidoDto> obterTodos() {
         return repository.findAll().stream()
                 .map(p -> modelMapper.map(p, PedidoDto.class))
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public PedidoDto obterPorId(Long id) {
         Pedido pedido = repository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);

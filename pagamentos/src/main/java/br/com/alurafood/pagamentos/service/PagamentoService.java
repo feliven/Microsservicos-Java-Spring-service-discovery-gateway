@@ -19,7 +19,6 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-@Transactional(readOnly = true)
 public class PagamentoService {
 
     @Autowired
@@ -31,6 +30,7 @@ public class PagamentoService {
     @Autowired
     private PedidoClient pedidoClient;
 
+    @Transactional(readOnly = true)
     public Page<PagamentoDto> obterTodosOsPagamentos(Pageable page) {
         return pagamentoRepository.findAll(page).map(p -> modelMapper.map(p, PagamentoDto.class));
     }
@@ -40,6 +40,7 @@ public class PagamentoService {
     // .map(p -> modelMapper.map(p, PagamentoDto.class)).toList();
     // }
 
+    @Transactional(readOnly = true)
     public PagamentoDto obterPagamentoPorId(Long id) {
         var pagamento = pagamentoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
 
