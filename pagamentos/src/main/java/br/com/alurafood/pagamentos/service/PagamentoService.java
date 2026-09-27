@@ -58,7 +58,6 @@ public class PagamentoService {
     public PagamentoDto atualizarPagamento(Long id, PagamentoDto dto) {
         var pagamento = modelMapper.map(dto, Pagamento.class);
         pagamento.setId(id);
-        pagamentoRepository.save(pagamento);
 
         return modelMapper.map(pagamento, PagamentoDto.class);
     }
