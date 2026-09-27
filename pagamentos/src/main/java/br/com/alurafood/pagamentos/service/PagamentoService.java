@@ -69,7 +69,7 @@ public class PagamentoService {
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    @CircuitBreaker(name = "atualizaPedido", fallbackMethod = "")
+    @CircuitBreaker(name = "atualizaPedido", fallbackMethod = "pagamentoAutorizadoComIntegracaoPendente")
     public void confirmarPagamento(Long id) {
         Optional<Pagamento> pagamentoOptional = pagamentoRepository.findById(id);
 
@@ -80,6 +80,21 @@ public class PagamentoService {
         var pagamento = pagamentoOptional.get();
         pagamento.setStatus(Status.CONFIRMADO);
         pagamentoRepository.save(pagamento);
-        pedidoClient.atualizaPagamento(pagamento.getPedidoId());
+        pedidoClient.confirmaPagamentoNoPedido(pagamento.getPedidoId());
+    }
+
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @CircuitBreaker(name = "atualizaPedido", fallbackMethod = "")
+    public void desconfirmarPagamento(Long id) {
+        Optional<Pagamento> pagamentoOptional = pagamentoRepository.findById(id);
+
+        if (!pagamentoOptional.isPresent()) {
+            throw new EntityNotFoundException();
+        }
+
+        var pagamento = pagamentoOptional.get();
+        pagamento.setStatus(Status.CRIADO);
+        pagamentoRepository.save(pagamento);
+        pedidoClient.desconfirmaPagamentoNoPedido(pagamento.getPedidoId());
     }
 }

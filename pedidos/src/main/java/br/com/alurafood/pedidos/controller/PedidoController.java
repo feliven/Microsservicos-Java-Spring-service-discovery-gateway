@@ -57,10 +57,17 @@ public class PedidoController {
     }
 
     @PutMapping("{id}/pago")
-    public ResponseEntity<Void> aprovaPagamento(@PathVariable @NotNull Long id) {
+    public ResponseEntity<String> aprovaPagamento(@PathVariable @NotNull Long id) {
         service.aprovaPagamentoPedido(id);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("pgto aprovado");
+    }
+
+    @PutMapping("{id}/nao-pago")
+    public ResponseEntity<String> desaprovaPagamento(@PathVariable @NotNull Long id) {
+        service.desaprovaPagamentoPedido(id);
+
+        return ResponseEntity.ok("pgto desaprovado");
     }
 
     @GetMapping("porta")

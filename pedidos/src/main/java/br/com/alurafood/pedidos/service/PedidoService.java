@@ -79,4 +79,17 @@ public class PedidoService {
         pedido.setStatus(Status.PAGO);
         repository.atualizaStatus(Status.PAGO, pedido);
     }
+
+    @Transactional
+    public void desaprovaPagamentoPedido(Long id) {
+
+        Pedido pedido = repository.porIdComItens(id);
+
+        if (pedido == null) {
+            throw new EntityNotFoundException();
+        }
+
+        pedido.setStatus(Status.REALIZADO);
+        repository.atualizaStatus(Status.REALIZADO, pedido);
+    }
 }

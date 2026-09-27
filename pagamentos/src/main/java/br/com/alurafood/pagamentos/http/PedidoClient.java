@@ -8,5 +8,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @FeignClient("pedidos-ms")
 public interface PedidoClient {
     @RequestMapping(method = RequestMethod.PUT, value = "/pedidos/{id}/pago")
-    void atualizaPagamento(@PathVariable Long id);
+    void confirmaPagamentoNoPedido(@PathVariable Long id);
+
+    @RequestMapping(method = RequestMethod.PUT, value = "/pedidos/{id}/nao-pago")
+    void desconfirmaPagamentoNoPedido(@PathVariable Long id);
 }
