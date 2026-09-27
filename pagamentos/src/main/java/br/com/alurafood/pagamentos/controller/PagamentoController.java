@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.alurafood.pagamentos.dto.PagamentoDto;
+import br.com.alurafood.pagamentos.dto.PagamentoGetDto;
 import br.com.alurafood.pagamentos.service.PagamentoService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -28,13 +29,13 @@ public class PagamentoController {
     private PagamentoService service;
 
     @GetMapping
-    public ResponseEntity<Page<PagamentoDto>> getAll(Pageable page) {
+    public ResponseEntity<Page<PagamentoGetDto>> getAll(Pageable page) {
         var pagamentos = service.obterTodosOsPagamentos(page);
         return ResponseEntity.ok(pagamentos);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<PagamentoDto> getById(@PathVariable @NotNull Long id) {
+    public ResponseEntity<PagamentoGetDto> getById(@PathVariable @NotNull Long id) {
         var dto = service.obterPagamentoPorId(id);
         return ResponseEntity.ok(dto);
     }

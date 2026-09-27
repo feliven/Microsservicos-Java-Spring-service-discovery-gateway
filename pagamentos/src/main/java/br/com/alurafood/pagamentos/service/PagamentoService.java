@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.alurafood.pagamentos.dto.PagamentoDto;
+import br.com.alurafood.pagamentos.dto.PagamentoGetDto;
 import br.com.alurafood.pagamentos.http.PedidoClient;
 import br.com.alurafood.pagamentos.model.Pagamento;
 import br.com.alurafood.pagamentos.model.Status;
@@ -30,21 +31,27 @@ public class PagamentoService {
     @Autowired
     private PedidoClient pedidoClient;
 
-    @Transactional(readOnly = true)
-    public Page<PagamentoDto> obterTodosOsPagamentos(Pageable page) {
-        return pagamentoRepository.findAll(page).map(p -> modelMapper.map(p, PagamentoDto.class));
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    public Page<PagamentoGetDto> obterTodosOsPagamentos(Pageable page) {
+        var pagamentoDtoPage = pagamentoRepository.findAll(page).map(p -> modelMapper.map(p, PagamentoGetDto.class));
+
+        var pedidos = pedidoClient.obterTodosPedidos();
+
+        pagamentoDtoPage.forEach(pgto -> pgto
+                .setPedido(pedidos.stream().filter(pedido -> pedido.getId() == pgto.getPedidoId()).findFirst().get()));
+
+        return pagamentoDtoPage;
     }
 
-    // private List<PagamentoDto> obterTodosSemPageable() {
-    // return pagamentoRepository.findAll().stream()
-    // .map(p -> modelMapper.map(p, PagamentoDto.class)).toList();
-    // }
-
-    @Transactional(readOnly = true)
-    public PagamentoDto obterPagamentoPorId(Long id) {
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    public PagamentoGetDto obterPagamentoPorId(Long id) {
         var pagamento = pagamentoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
 
-        return modelMapper.map(pagamento, PagamentoDto.class);
+        var pedido = pedidoClient.obterPedidoPorId(id);
+
+        var pagamentoDto = modelMapper.map(pagamento, PagamentoGetDto.class);
+        pagamentoDto.setPedido(pedido);
+        return pagamentoDto;
     }
 
     @Transactional
