@@ -15,6 +15,7 @@ import br.com.alurafood.pagamentos.http.PedidoClient;
 import br.com.alurafood.pagamentos.model.Pagamento;
 import br.com.alurafood.pagamentos.model.Status;
 import br.com.alurafood.pagamentos.repository.PagamentoRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -68,6 +69,7 @@ public class PagamentoService {
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    @CircuitBreaker(name = "atualizaPedido", fallbackMethod = "")
     public void confirmarPagamento(Long id) {
         Optional<Pagamento> pagamentoOptional = pagamentoRepository.findById(id);
 
