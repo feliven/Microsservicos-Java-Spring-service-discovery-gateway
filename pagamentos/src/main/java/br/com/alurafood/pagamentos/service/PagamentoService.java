@@ -78,9 +78,22 @@ public class PagamentoService {
         }
 
         var pagamento = pagamentoOptional.get();
+        pedidoClient.confirmaPagamentoNoPedido(pagamento.getPedidoId()); // tenta a integração primeiro
         pagamento.setStatus(Status.CONFIRMADO);
+        pagamentoRepository.save(pagamento); // só persiste se a chamada deu certo
+    }
+
+    @Transactional
+    public void pagamentoAutorizadoComIntegracaoPendente(Long id, Exception e) {
+        Optional<Pagamento> pagamentoOptional = pagamentoRepository.findById(id);
+
+        if (!pagamentoOptional.isPresent()) {
+            throw new EntityNotFoundException();
+        }
+
+        var pagamento = pagamentoOptional.get();
+        pagamento.setStatus(Status.CONFIRMADO_SEM_INTEGRACAO);
         pagamentoRepository.save(pagamento);
-        pedidoClient.confirmaPagamentoNoPedido(pagamento.getPedidoId());
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -93,8 +106,8 @@ public class PagamentoService {
         }
 
         var pagamento = pagamentoOptional.get();
+        pedidoClient.desconfirmaPagamentoNoPedido(pagamento.getPedidoId()); // tenta a integração primeiro
         pagamento.setStatus(Status.CRIADO);
-        pagamentoRepository.save(pagamento);
-        pedidoClient.desconfirmaPagamentoNoPedido(pagamento.getPedidoId());
+        pagamentoRepository.save(pagamento); // só persiste se a chamada deu certo
     }
 }
