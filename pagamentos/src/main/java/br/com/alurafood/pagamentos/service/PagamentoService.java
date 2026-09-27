@@ -1,6 +1,9 @@
 package br.com.alurafood.pagamentos.service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.alurafood.pagamentos.dto.ItemPedidoDto;
 import br.com.alurafood.pagamentos.dto.PagamentoDto;
 import br.com.alurafood.pagamentos.dto.PagamentoGetDto;
 import br.com.alurafood.pagamentos.http.PedidoClient;
@@ -31,26 +35,28 @@ public class PagamentoService {
     @Autowired
     private PedidoClient pedidoClient;
 
-    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public Page<PagamentoGetDto> obterTodosOsPagamentos(Pageable page) {
         var pagamentoDtoPage = pagamentoRepository.findAll(page).map(p -> modelMapper.map(p, PagamentoGetDto.class));
 
         var pedidos = pedidoClient.obterTodosPedidos();
 
-        pagamentoDtoPage.forEach(pgto -> pgto
-                .setPedido(pedidos.stream().filter(pedido -> pedido.getId() == pgto.getPedidoId()).findFirst().get()));
+        Map<Long, List<ItemPedidoDto>> pedidosPorId = pedidos.stream()
+                .collect(Collectors.toMap(p -> p.getId(), p -> p.getItens()));
+
+        pagamentoDtoPage.forEach(pgto -> pgto.setItens(pedidosPorId.get(pgto.getPedidoId())));
 
         return pagamentoDtoPage;
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public PagamentoGetDto obterPagamentoPorId(Long id) {
         var pagamento = pagamentoRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
 
         var pedido = pedidoClient.obterPedidoPorId(id);
 
         var pagamentoDto = modelMapper.map(pagamento, PagamentoGetDto.class);
-        pagamentoDto.setPedido(pedido);
+        pagamentoDto.setItens(pedido.getItens());
         return pagamentoDto;
     }
 
