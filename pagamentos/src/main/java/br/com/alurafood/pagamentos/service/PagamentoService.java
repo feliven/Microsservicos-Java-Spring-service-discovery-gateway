@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.alurafood.pagamentos.dto.PagamentoDto;
@@ -27,7 +28,7 @@ public class PagamentoService {
     private ModelMapper modelMapper;
 
     @Autowired
-    private PedidoClient pedido;
+    private PedidoClient pedidoClient;
 
     public Page<PagamentoDto> obterTodosOsPagamentos(Pageable page) {
         return pagamentoRepository.findAll(page).map(p -> modelMapper.map(p, PagamentoDto.class));
@@ -67,7 +68,7 @@ public class PagamentoService {
         pagamentoRepository.deleteById(id);
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void confirmarPagamento(Long id) {
         Optional<Pagamento> pagamentoOptional = pagamentoRepository.findById(id);
 
@@ -78,6 +79,6 @@ public class PagamentoService {
         var pagamento = pagamentoOptional.get();
         pagamento.setStatus(Status.CONFIRMADO);
         pagamentoRepository.save(pagamento);
-        pedido.atualizaPagamento(pagamento.getPedidoId());
+        pedidoClient.atualizaPagamento(pagamento.getPedidoId());
     }
 }
