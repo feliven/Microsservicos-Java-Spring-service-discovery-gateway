@@ -1,5 +1,7 @@
 package br.com.alurafood.pagamentos.controller;
 
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,9 @@ public class PagamentoController {
     @Autowired
     private PagamentoService service;
 
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     @GetMapping
     public ResponseEntity<Page<PagamentoGetDto>> getAll(Pageable page) {
         var pagamentos = service.obterTodosOsPagamentos(page);
@@ -46,6 +51,10 @@ public class PagamentoController {
         var pagamento = service.criarPagamento(dto);
 
         var uri = uriBuilder.path("/pagamentos/{id}").buildAndExpand(pagamento.getId()).toUri();
+
+        var mensagem = "criei um pagamento com id: " + pagamento.getId();
+        var rabbitMsg = new Message(mensagem.getBytes());
+        rabbitTemplate.send("pagamento.concluido", rabbitMsg);
 
         return ResponseEntity.created(uri).body(pagamento);
     }
