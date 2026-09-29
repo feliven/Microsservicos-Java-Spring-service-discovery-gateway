@@ -8,7 +8,7 @@ import br.com.alurafood.pedidos.dto.PagamentoDto;
 @Component
 public class PagamentoListener {
 
-    @RabbitListener(queues = "pagamento.concluido")
+    @RabbitListener(queues = "pagamento.detalhes-pedido")
     public void recebeMensagem(PagamentoDto pagamento) {
         System.out.println("""
                 Pagamento do pedido id %s recebido!
