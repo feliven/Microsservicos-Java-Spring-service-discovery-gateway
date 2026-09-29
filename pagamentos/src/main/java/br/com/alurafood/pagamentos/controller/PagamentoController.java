@@ -1,6 +1,5 @@
 package br.com.alurafood.pagamentos.controller;
 
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -52,9 +51,7 @@ public class PagamentoController {
 
         var uri = uriBuilder.path("/pagamentos/{id}").buildAndExpand(pagamento.getId()).toUri();
 
-        var mensagem = "criei um pagamento com id: " + pagamento.getId();
-        var rabbitMsg = new Message(mensagem.getBytes());
-        rabbitTemplate.send("pagamento.concluido", rabbitMsg);
+        rabbitTemplate.convertAndSend("pagamento.concluido", pagamento);
 
         return ResponseEntity.created(uri).body(pagamento);
     }
